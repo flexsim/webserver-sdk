@@ -1,0 +1,20 @@
+{
+    "name": "flexsim/webserver-sdk",
+    "description": "A package that simplifies talking to a FlexSim Webserver instance",
+    "authors": [
+        {
+            "name": "Cole Shirley",
+            "email": "cole.shirley@flexsim.com"
+        }
+    ],
+    "type": "package",
+    "require": {
+        "php": ">=7.2",
+        "guzzlehttp/guzzle": "^7.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Flexsim\\WebserverSDK\\": "src/"
+        }
+    }
+}
