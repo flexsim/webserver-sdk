@@ -6,9 +6,9 @@ class RequestHandler
 {
     protected $guzzleClient;
 
-    public function __construct($webserverClient)
+    public function __construct($uri)
     {
-        $uri = \substr($webserverClient->getBaseURI(), 0, \strpos($webserverClient->getBaseURI(), 'webserver.dll'));
+        $uri = rtrim(explode('webserver.dll', $uri)[0], "/") . '/';
 
         $this->guzzleClient = new \GuzzleHttp\Client([
             'base_uri' => $uri
@@ -17,27 +17,27 @@ class RequestHandler
 
     protected function sendRequest($queryParameters)
     {
-        return $this->guzzleClients->get('webserver.dll', $queryParameters);
+        return $this->guzzleClient->get('webserver.dll', $queryParameters);
     }
 
     public function availableModels()
     {
         return $this->sendRequest([
-            'query' => ['availablemodels']
+            'query' => 'availablemodels'
         ]);
     }
 
     public function allFiles()
     {
         return $this->sendRequest([
-            'query' => ['allfiles']
+            'query' => 'allfiles'
         ]);
     }
 
     public function configuration()
     {
         return $this->sendRequest([
-            'query' => ['configuration']
+            'query' => 'configuration'
         ]);
     }
 
@@ -65,14 +65,14 @@ class RequestHandler
     public function instanceList()
     {
         return $this->sendRequest([
-            'query' => ['instancelist']
+            'query' => 'instancelist'
         ]);
     }
 
     public function numInstances()
     {
         return $this->sendRequest([
-            'query' => ['numinstances']
+            'query' => 'numinstances'
         ]);
     }
 
@@ -83,13 +83,16 @@ class RequestHandler
         ]);
     }
 
-    public function queryInstance($modelName, $instanceNum)
+    public function queryInstance($modelName, $instanceNum, $queries = [])
     {
         return $this->sendRequest([
-            'query' => [
-                'queryinstance' => $modelName,
-                'instancenum' => $instanceNum
-            ]
+            'query' => array_merge(
+                [
+                    'queryinstance' => $modelName,
+                    'instancenum' => $instanceNum
+                ],
+                $queries
+            )
         ]);
     }
 
@@ -106,14 +109,14 @@ class RequestHandler
     public function getLibraries()
     {
         return $this->sendRequest([
-            'query' => ['getlibraries']
+            'query' => 'getlibraries'
         ]);
     }
 
     public function getModules()
     {
         return $this->sendRequest([
-            'query' => ['getmodules']
+            'query' => 'getmodules'
         ]);
     }
 

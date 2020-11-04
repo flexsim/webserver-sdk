@@ -2,44 +2,43 @@
 
 namespace Flexsim\WebserverSDK;
 
-use GuzzleHttp\Exception\BadResponseException;
 use Psr\Http\Message\ResponseInterface;
+use SimpleXMLElement;
 
 class WebserverClient
 {
-    protected $requestHandlerClass;
-    protected $xmlParser;
-    protected $baseURI;
+    protected $baseUri;
 
-    public function __construct($baseURI, $options = [])
+    protected $requestHandler;
+
+    public function __construct($baseUri)
     {
-        $this->baseURI = $baseURI;
-
-        $this->requestHandlerClass = $options['requestHandler'] ?? RequestHandler::class;
-
-        $this->xmlParser = $options['xmlParser'] ?? xml_parser_create();
+        $this->baseUri = $baseUri;
     }
 
     public function __call($method, $parameters)
     {
-        return $this->handleResponse($this->requestHandler()->$method(...$parameters));
+        return $this->handleResponse($this->getRequestHandler()->$method(...$parameters));
     }
 
-    protected function requestHandler()
+    protected function getRequestHandler()
     {
-        $requestHandlerClass = $this->requestHandlerClass;
-        return new $requestHandlerClass($this);
+        if (\is_null($this->requestHandler)) {
+            $this->requestHandler = new RequestHandler($this->baseUri);
+        }
+
+        return $this->requestHandler;
     }
 
-    public static function connect($uri, $options = [])
+    public static function connect($uri)
     {
-        return new static($uri, $options);
+        return new static($uri);
     }
 
     protected function handleResponse(ResponseInterface $response)
     {
         if ($response->getStatusCode() == 200) {
-            return \xml_parse($this->xmlParser, (string) $response->getBody());
+            return new SimpleXMLElement($response->getBody());
         }
 
         return $response;
