@@ -6,7 +6,9 @@ class RequestHandler
 {
     protected $guzzleClient;
 
-    public function __construct($uri)
+    protected $async = false;
+
+    public function __construct($uri, $async = false)
     {
         $uri = rtrim(explode('webserver.dll', $uri)[0], "/") . '/';
 
@@ -15,9 +17,13 @@ class RequestHandler
         ]);
     }
 
-    protected function sendRequest($queryParameters)
+    protected function sendRequest($options)
     {
-        return $this->guzzleClient->get('webserver.dll', $queryParameters);
+        if ($this->async) {
+            return $this->guzzleClient->getAsync('webserver.dll', $options);
+        }
+
+        return $this->guzzleClient->get('webserver.dll', $options);
     }
 
     public function availableModels()

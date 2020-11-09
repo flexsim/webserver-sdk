@@ -18,13 +18,17 @@ class WebserverClient
 
     public function __call($method, $parameters)
     {
-        return $this->handleResponse($this->getRequestHandler()->$method(...$parameters));
+        $async = !!\strpos($method, 'Async');
+
+        $method = \explode('Async', $method)[0];
+
+        return $this->handleResponse($this->getRequestHandler($async)->$method(...$parameters));
     }
 
-    protected function getRequestHandler()
+    protected function getRequestHandler($async)
     {
         if (\is_null($this->requestHandler)) {
-            $this->requestHandler = new RequestHandler($this->baseUri);
+            $this->requestHandler = new RequestHandler($this->baseUri, $async);
         }
 
         return $this->requestHandler;
